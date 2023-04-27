@@ -41,7 +41,7 @@ public class FilmeController : ControllerBase
 
         return CreatedAtAction(
             nameof(ListaFilmePorId),
-            new { id = filme.GetId() },
+            new { id = filme.Id },
             filme);
     }
 
@@ -49,7 +49,7 @@ public class FilmeController : ControllerBase
     public IActionResult ListaFilmePorId(int id)
     {
         var filme = _context.Filmes
-            .FirstOrDefault(filme => filme.GetId() == id);
+            .FirstOrDefault(filme => filme.Id == id);
 
         return filme != null ? Ok(filme) : NotFound();
     }
@@ -57,7 +57,7 @@ public class FilmeController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult AtualizaFilme(int id, [FromBody] UpdateFilmeDto filmeDto)
     {
-        var filme = _context.Filmes.FirstOrDefault(filme => filme.GetId() == id);
+        var filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
 
         if (filme == null) return NotFound();
 
@@ -70,9 +70,15 @@ public class FilmeController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult RemoverFilme(int id)
     {
-        var filme = _context.Filmes.FirstOrDefault(filme => filme.GetId() == id);
+        var filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
 
-        return filme != null ? Ok(_context.Filmes.Remove(filme)) : NotFound();
+        if (filme == null)
+            return NotFound();
+
+        _context.Filmes.Remove(filme);
+        _context.SaveChanges();
+        
+        return Ok(filme);
     }
 
 }
